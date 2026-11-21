@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>NovaCalc | Calculator & Games</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d30;--panel2:#18263d;--line:#293a55;--text:#edf4ff;--muted:#9aacc6;--accent:#68e0c1;--accent2:#7aa8ff;--danger:#ff7d91}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 15% 0%,#1b3150 0,transparent 35%),var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer}
+.topbar{height:70px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(22px,calc((100% - 1120px)/2));background:#0b1220dd;position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-.5px}
+.logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#0b1727;font-weight:900}
+.top-note{color:var(--muted);font-size:13px}
+main{max-width:1120px;margin:38px auto;padding:0 20px 60px}
+.hero{margin-bottom:25px}
+.eyebrow{color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:1.7px;font-size:11px}
+h1{font-size:clamp(27px,4vw,40px);line-height:1.1;margin:8px 0}
+.sub{color:var(--muted);margin:0}
+.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:20px;align-items:start}
+.panel{background:linear-gradient(160deg,#16243a,#101a2b);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 50px #0003}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px}
+.panel-head h2{font-size:17px;margin:0}
+.pill{border:1px solid #31506a;border-radius:999px;color:var(--accent);padding:5px 10px;font-size:11px;font-weight:700}
+.display{background:#091321;border:1px solid #263952;border-radius:15px;padding:17px 18px;min-height:108px;margin-bottom:14px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.expression{color:var(--muted);font-size:15px;min-height:23px;overflow-wrap:anywhere;text-align:right}
+.result{font-size:clamp(27px,5vw,38px);font-weight:750;text-align:right;letter-spacing:-1px;overflow-wrap:anywhere}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.key{min-height:53px;border:1px solid #2b3e59;background:#1b2a42;color:var(--text);border-radius:12px;font-size:17px;font-weight:650;transition:.15s}
+.key:hover{background:#263b59;transform:translateY(-1px)}
+.key.op{color:var(--accent);background:#173044}
+.key.utility{color:#b7c9e4;background:#172338}
+.key.equals{background:linear-gradient(135deg,#55d9b7,#6eafff);color:#071727;border:0}
+.key.wide{grid-column:span 2}
+.code-row{display:flex;align-items:center;justify-content:space-between;margin-top:17px;padding-top:15px;border-top:1px solid var(--line);gap:12px}
+.code-copy{color:var(--muted);font-size:13px}
+.toggle{border:0;border-radius:10px;background:var(--accent);color:#071727;font-weight:800;padding:10px 15px}
+.side-title{font-size:17px;margin:0 0 7px}
+.side-text{color:var(--muted);font-size:13px;margin:0 0 18px}
+.feature{padding:13px 0;border-top:1px solid var(--line);display:flex;gap:12px}
+.feature-icon{width:34px;height:34px;border-radius:10px;background:#1d344a;display:grid;place-items:center;flex:none}
+.feature strong{display:block;font-size:13px}
+.feature span{color:var(--muted);font-size:12px}
+.hidden{display:none!important}
+.vault-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.vault-head h1{margin:5px 0 6px}
+.exit{border:1px solid #3a4d67;color:var(--text);background:#17253a;border-radius:10px;padding:9px 13px}
+.vault-tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.search{flex:1;min-width:190px;background:#091321;border:1px solid var(--line);border-radius:11px;padding:11px 13px;color:var(--text);outline:none}
+.search:focus{border-color:var(--accent2)}
+.categories{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.category{border:1px solid var(--line);background:#142238;color:var(--muted);padding:7px 12px;border-radius:999px;font-size:12px}
+.category.active{background:#183c43;color:var(--accent);border-color:#39786e}
+.game-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.game-card{background:#142238;border:1px solid var(--line);border-radius:15px;padding:16px;min-height:145px;display:flex;flex-direction:column;align-items:flex-start}
+.game-emoji{font-size:27px;margin-bottom:7px}
+.game-card h3{font-size:15px;margin:0 0 3px}
+.game-card p{font-size:12px;color:var(--muted);margin:0 0 12px}
+.play{margin-top:auto;border:0;background:#25465a;color:#bdf8e9;border-radius:8px;padding:7px 11px;font-weight:700;font-size:12px}
+.empty{color:var(--muted);padding:25px;text-align:center;border:1px dashed var(--line);border-radius:13px;grid-column:1/-1}
+.game-stage{margin-top:20px}
+.game-stage h2{margin:0 0 12px;font-size:18px}
+.stage-inner{background:#091321;border:1px solid var(--line);border-radius:14px;padding:18px;min-height:160px}
+.stage-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.stage-top button{background:#21344d;color:var(--text);border:1px solid #38516e;border-radius:8px;padding:7px 10px}
+.stage-content{text-align:center}
+.big-number{font-size:35px;font-weight:800;margin:10px}
+.action{background:var(--accent);color:#071727;border:0;border-radius:9px;padding:10px 16px;font-weight:800;margin:5px}
+.secondary{background:#21344d;color:var(--text);border:1px solid #38516e;border-radius:9px;padding:9px 14px;margin:5px}
+.board{display:grid;grid-template-columns:repeat(3,70px);gap:7px;justify-content:center;margin:12px auto}
+.cell{height:70px;border-radius:10px;border:1px solid #38516e;background:#17283f;color:var(--text);font-size:27px;font-weight:800}
+.memory-grid{display:grid;grid-template-columns:repeat(4,55px);gap:7px;justify-content:center;margin:12px}
+.memory-cell{height:55px;border:1px solid #38516e;background:#1b2d46;border-radius:9px;font-size:21px}
+footer{max-width:1120px;margin:0 auto;padding:0 20px 30px;color:#7285a1;font-size:12px}
+@media(max-width:760px){main{margin-top:25px}.layout{grid-template-columns:1fr}.game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.top-note{display:none}}
+@media(max-width:420px){.game-grid{grid-template-columns:1fr}.panel{padding:15px}.key{min-height:49px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="logo">N</div> NovaCalc</div>
+  <div class="top-note">Tools for thinking. A little room for fun.</div>
+</header>
+<main>
+  <section id="calculatorView">
+    <div class="hero">
+      <div class="eyebrow">Smart tools, simple interface</div>
+      <h1>Calculator, with a hidden side.</h1>
+      <p class="sub">A clean calculator for everyday math. There may be more hiding in Code Mode.</p>
+    </div>
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-head"><h2>Scientific calculator</h2><span class="pill">STANDARD MODE</span></div>
+        <div class="display"><div id="expression" class="expression">Ready</div><div id="result" class="result">0</div></div>
+        <div class="keys" id="keys">
+          <button class="key utility" data-action="clear">AC</button><button class="key utility" data-action="delete">DEL</button><button class="key op" data-value="(">(</button><button class="key op" data-value=")">)</button>
+          <button class="key op" data-value="sin(">sin</button><button class="key op" data-value="cos(">cos</button><button class="key op" data-value="tan(">tan</button><button class="key op" data-value="÷">÷</button>
+          <button class="key" data-value="7">7</button><button class="key" data-value="8">8</button><button class="key" data-value="9">9</button><button class="key op" data-value="×">×</button>
+          <button class="key" data-value="4">4</button><button class="key" data-value="5">5</button><button class="key" data-value="6">6</button><button class="key op" data-value="-">−</button>
+          <button class="key" data-value="1">1</button><button class="key" data-value="2">2</button><button class="key" data-value="3">3</button><button class="key op" data-value="+">+</button>
+          <button class="key" data-value="0">0</button><button class="key" data-value=".">.</button><button class="key op" data-value="π">π</button><button class="key equals" data-action="equals">=</button>
+          <button class="key op" data-value="√(">√</button><button class="key op" data-value="^">xʸ</button><button class="key op" data-value="%">%</button><button class="key op" data-value="!">x!</button>
+        </div>
+        <div class="code-row"><div class="code-copy">Have a code? Try the hidden mode.</div><button class="toggle" id="codeMode">Code Mode ↗</button></div>
+      </section>
+      <aside class="panel">
+        <h2 class="side-title">Your everyday math toolkit</h2>
+        <p class="side-text">A few useful features are built in. More can be added as the project grows.</p>
+        <div class="feature"><div class="feature-icon">ƒx</div><div><strong>Scientific functions</strong><span>Trigonometry, square roots, powers and more.</span></div></div>
+        <div class="feature"><div class="feature-icon">⌨</div><div><strong>Keyboard support</strong><span>Type numbers and operators directly.</span></div></div>
+        <div class="feature"><div class="feature-icon">◈</div><div><strong>Hidden Code Mode</strong><span>Enter the secret access code to reveal the vault.</span></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="vaultView" class="hidden">
+    <div class="vault-head">
+      <div><div class="eyebrow">Access granted</div><h1>Games Vault</h1><p class="sub">A small collection of quick games. Pick one and play.</p></div>
+      <button class="exit" id="exitVault">← Exit vault</button>
+    </div>
+    <div class="panel">
+      <div class="vault-tools"><input id="gameSearch" class="search" type="search" placeholder="Search games..." aria-label="Search games"><span class="pill">6 MINI GAMES</span></div>
+      <div class="categories" id="categories">
+        <button class="category active" data-category="All">All games</button><button class="category" data-category="Arcade">Arcade</button><button class="category" data-category="Puzzle">Puzzle</button><button class="category" data-category="Classic">Classic</button>
+      </div>
+      <div class="game-grid" id="gameGrid"></div>
+      <section id="gameStage" class="game-stage hidden">
+        <div class="stage-top"><h2 id="gameTitle">Game</h2><button id="closeGame">Close game ✕</button></div>
+        <div class="stage-inner" id="gameContent"></div>
+      </section>
+    </div>
+  </section>
+</main>
+<footer>NovaCalc is an independent demo project. It is not affiliated with SolvCalc.</footer>
+<script>
+const $ = s => document.querySelector(s);
+let expression = '';
+const exprEl=$('#expression'), resultEl=$('#result');
+function render(){exprEl.textContent=expression||'Ready';}
+function factorial(n){if(n<0||!Number.isInteger(n)||n>170)throw Error('Factorial requires a whole number from 0 to 170');let v=1;for(let i=2;i<=n;i++)v*=i;return v;}
+function calculate(){
+  let s=expression.replaceAll('×','*').replaceAll('÷','/').replaceAll('π','Math.PI').replaceAll('^','**').replace(/√\(/g,'Math.sqrt(').replace(/sin\(/g,'Math.sin(Math.PI/180*').replace(/cos\(/g,'Math.cos(Math.PI/180*').replace(/tan\(/g,'Math.tan(Math.PI/180*').replace(/(\d+(?:\.\d+)?)%/g,'($1/100)');
+  s=s.replace(/(\d+(?:\.\d+)?)!/g,'factorial($1)');
+  if(!s.trim())return;
+  if(!/^[0-9+\-*/().,%\sA-Za-z_*]+$/.test(s)||/(window|document|constructor|function|=>)/i.test(s))throw Error('Invalid expression');
+  const value=Function('factorial','return ('+s+')')(factorial);
+  if(typeof value!=='number'||!Number.isFinite(value))throw Error('Math error');
+  resultEl.textContent=Number(value.toPrecision(11)).toString();
+}
+$('#keys').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.action==='clear'){expression='';resultEl.textContent='0';}
+ else if(b.dataset.action==='delete'){expression=expression.slice(0,-1);}
+ else if(b.dataset.action==='equals'){try{calculate();}catch(err){resultEl.textContent=err.message;}}
+ else expression+=b.dataset.value;
+ render();
+});
+document.addEventListener('keydown',e=>{
+ if(!$('#vaultView').classList.contains('hidden'))return;
+ if(/^[0-9.]$/.test(e.key)||['+','-','(',')','%','^'].includes(e.key)){expression+=e.key;render();}
+ else if(e.key==='*'){expression+='×';render();}
+ else if(e.key==='/'){expression+='÷';render();}
+ else if(e.key==='Enter'){try{calculate();}catch(err){resultEl.textContent=err.message;}}
+ else if(e.key==='Backspace'){expression=expression.slice(0,-1);render();}
+ else if(e.key==='Escape'){expression='';resultEl.textContent='0';render();}
+});
+function enterCode(){const code=prompt('Enter access code');if(code===null)return;if(code==='0000'){showVault();}else alert('Access code not recognized.');}
+$('#codeMode').addEventListener('click',enterCode);
+function showVault(){$('#calculatorView').classList.add('hidden');$('#vaultView').classList.remove('hidden');renderGames();}
+function leaveVault(){$('#vaultView').classList.add('hidden');$('#calculatorView').classList.remove('hidden');closeGame();}
+$('#exitVault').addEventListener('click',leaveVault);
+const games=[
+ {name:'Snake',desc:'Eat the dots and grow. Avoid the walls and yourself.',emoji:'🐍',cat:'Arcade',play:snakeGame},
+ {name:'Tic-Tac-Toe',desc:'Get three marks in a row against a friend.',emoji:'⭕',cat:'Classic',play:ticTacToe},
+ {name:'Memory Match',desc:'Flip cards and find all matching pairs.',emoji:'🧠',cat:'Puzzle',play:memoryGame},
+ {name:'Number Guess',desc:'Find the secret number from 1 to 100.',emoji:'🔢',cat:'Puzzle',play:numberGame},
+ {name:'Click Sprint',desc:'How many times can you click in ten seconds?',emoji:'⚡',cat:'Arcade',play:clickSprint},
+ {name:'Reaction Test',desc:'Wait for green, then click as quickly as you can.',emoji:'🎯',cat:'Arcade',play:reactionGame}
+];
+let activeCategory='All';
+function renderGames(){
+ const q=$('#gameSearch').value.toLowerCase();
+ const filtered=games.filter(g=>(activeCategory==='All'||g.cat===activeCategory)&&(g.name+' '+g.desc).toLowerCase().includes(q));
+ $('#gameGrid').innerHTML=filtered.length?filtered.map((g,i)=>`<article class="game-card"><div class="game-emoji">${g.emoji}</div><h3>${g.name}</h3><p>${g.desc}</p><button class="play" data-game="${games.indexOf(g)}">Play game →</button></article>`).join(''):'<div class="empty">No games found. Try another search.</div>';
+}
+$('#gameSearch').addEventListener('input',renderGames);
+$('#categories').addEventListener('click',e=>{const b=e.target.closest('[data-category]');if(!b)return;activeCategory=b.dataset.category;document.querySelectorAll('.category').forEach(x=>x.classList.toggle('active',x===b));renderGames();});
+$('#gameGrid').addEventListener('click',e=>{const b=e.target.closest('[data-game]');if(!b)return;const g=games[Number(b.dataset.game)];$('#gameTitle').textContent=g.name;$('#gameStage').classList.remove('hidden');g.play();$('#gameStage').scrollIntoView({behavior:'smooth',block:'nearest'});});
+$('#closeGame').addEventListener('click',closeGame);
+function closeGame(){if($('#gameContent'))$('#gameContent').innerHTML='';$('#gameStage').classList.add('hidden');}
+function snakeGame(){
+ const c=$('#gameContent');c.innerHTML='<div class="stage-content"><p>Use the arrow keys to guide the snake. Eat the red square.</p><canvas id="snakeCanvas" width="300" height="300" style="max-width:100%;background:#0e1a2b;border:1px solid #38516e;border-radius:10px"></canvas><p id="snakeScore">Score: 0</p><button class="action" id="snakeStart">Start / Restart</button></div>';
+ const canvas=$('#snakeCanvas'),ctx=canvas.getContext('2d');let snake,food,dir,next,score,timer,alive;
+ function reset(){clearInterval(timer);snake=[{x:7,y:7},{x:6,y:7},{x:5,y:7}];food={x:12,y:8};dir={x:1,y:0};next=dir;score=0;alive=true;draw();$('#snakeScore').textContent='Score: 0';timer=setInterval(tick,125);}
+ function draw(){ctx.clearRect(0,0,300,300);ctx.fillStyle='#ff7d91';ctx.fillRect(food.x*15,food.y*15,13,13);snake.forEach((p,i)=>{ctx.fillStyle=i?'#55c9a9':'#b6ffe9';ctx.fillRect(p.x*15,p.y*15,13,13);});}
+ function tick(){dir=next;const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};if(h.x<0||h.y<0||h.x>=20||h.y>=20||snake.some(p=>p.x===h.x&&p.y===h.y)){alive=false;clearInterval(timer);$('#snakeScore').textContent='Game over! Score: '+score;return;}snake.unshift(h);if(h.x===food.x&&h.y===food.y){score++;$('#snakeScore').textContent='Score: '+score;food={x:Math.floor(Math.random()*20),y:Math.floor(Math.random()*20)};}else snake.pop();draw();}
+ document.onkeydown=e=>{const map={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0}};const d=map[e.key];if(d&&d.x!==-dir.x&&d.y!==-dir.y){next=d;e.preventDefault();}};
+ $('#snakeStart').onclick=reset;reset();
+}
+function ticTacToe(){
+ const c=$('#gameContent');c.innerHTML='<div class="stage-content"><p id="tttStatus">Player X starts.</p><div class="board" id="tttBoard"></div><button class="secondary" id="tttReset">Restart</button></div>';
+ let board=Array(9).fill(''),turn='X',done=false;const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+ function draw(){$('#tttBoard').innerHTML=board.map((v,i)=>`<button class="cell" data-cell="${i}">${v}</button>`).join('');}
+ function reset(){board=Array(9).fill('');turn='X';done=false;$('#tttStatus').textContent='Player X starts.';draw();}
+ $('#tttBoard').onclick=e=>{const b=e.target.closest('[data-cell]');if(!b||done||board[b.dataset.cell])return;board[b.dataset.cell]=turn;const win=wins.some(w=>w.every(i=>board[i]===turn));if(win){done=true;$('#tttStatus').textContent='Player '+turn+' wins!';}else if(board.every(Boolean)){done=true;$('#tttStatus').textContent="It's a draw!";}else{turn=turn==='X'?'O':'X';$('#tttStatus').textContent='Player '+turn+' turn.';}draw();};
+ $('#tttReset').onclick=reset;draw();
+}
+function memoryGame(){
+ const c=$('#gameContent');c.innerHTML='<div class="stage-content"><p id="memStatus">Find all 6 pairs.</p><div class="memory-grid" id="memGrid"></div><button class="secondary" id="memReset">Restart</button></div>';
+ let vals,opened,matched,lock,moves;
+ function reset(){vals=['🍉','🚀','🐸','🎧','⭐','🍕','🍉','🚀','🐸','🎧','⭐','🍕'].sort(()=>Math.random()-.5);opened=[];matched=[];lock=false;moves=0;draw();}
+ function draw(){$('#memGrid').innerHTML=vals.map((v,i)=>`<button class="memory-cell" data-card="${i}">${matched.includes(i)||opened.includes(i)?v:'?'}</button>`).join('');$('#memStatus').textContent=`Moves: ${moves} · Pairs: ${matched.length/2}/6`;}
+ $('#memGrid').onclick=e=>{const b=e.target.closest('[data-card]'),i=Number(b?.dataset.card);if(!b||lock||matched.includes(i)||opened.includes(i))return;opened.push(i);draw();if(opened.length===2){moves++;if(vals[opened[0]]===vals[opened[1]]){matched.push(...opened);opened=[];draw();if(matched.length===12)$('#memStatus').textContent=`You won in ${moves} moves!`;}else{lock=true;setTimeout(()=>{opened=[];lock=false;draw();},700);}}};
+ $('#memReset').onclick=reset;reset();
+}
+function numberGame(){
+ const c=$('#gameContent');c.innerHTML='<div class="stage-content"><p>I'm thinking of a number between 1 and 100.</p><input id="guessInput" type="number" min="1" max="100" class="search" style="max-width:180px" placeholder="Your guess"><button class="action" id="guessBtn">Guess</button><p id="guessMsg">You have unlimited tries.</p><button class="secondary" id="guessReset">New number</button></div>';
+ let secret=Math.floor(Math.random()*100)+1;$('#guessBtn').onclick=()=>{const n=Number($('#guessInput').value);if(!n||n<1||n>100){$('#guessMsg').textContent='Enter a number from 1 to 100.';return;}$('#guessMsg').textContent=n===secret?'🎉 Correct! You found it.':n<secret?'Too low. Try higher.':'Too high. Try lower.';};$('#guessReset').onclick=()=>{secret=Math.floor(Math.random()*100)+1;$('#guessInput').value='';$('#guessMsg').textContent='New number picked. Try again!';};
+}
+function clickSprint(){
+ const c=$('#gameContent');c.innerHTML='<div class="stage-content"><p>Click as many times as possible in 10 seconds.</p><div class="big-number" id="clickCount">0</div><button class="action" id="clickButton">Start</button><p id="clickTime">Ready?</p></div>';
+ let count=0,started=false,remaining=10,interval;$('#clickButton').onclick=()=>{if(!started){started=true;count=0;remaining=10;$('#clickButton').textContent='CLICK!';$('#clickTime').textContent='10 seconds left';interval=setInterval(()=>{remaining--;$('#clickTime').textContent=remaining+' seconds left';if(remaining<=0){clearInterval(interval);started=false;$('#clickButton').textContent='Try again';$('#clickTime').textContent='Time! Final score: '+count;}},1000);}if(started){count++;$('#clickCount').textContent=count;}};
+}
+function reactionGame(){
+ const c=$('#gameContent');c.innerHTML='<div class="stage-content"><p>Press start, wait for the panel to turn green, then click it.</p><button class="action" id="reactButton" style="min-width:190px;min-height:90px">Start</button><p id="reactResult">Your reaction time will appear here.</p></div>';
+ let state='idle',startAt=0,timeout;const b=$('#reactButton');b.onclick=()=>{if(state==='idle'||state==='done'){state='wait';b.textContent='Wait for green...';b.style.background='#a65d73';$('#reactResult').textContent='Not yet!';timeout=setTimeout(()=>{state='go';startAt=performance.now();b.textContent='CLICK NOW!';b.style.background='#55d9a8';},1000+Math.random()*3500);}else if(state==='wait'){clearTimeout(timeout);state='done';b.textContent='Too soon! Try again';b.style.background='';$('#reactResult').textContent='You clicked before green.';}else if(state==='go'){const ms=Math.round(performance.now()-startAt);state='done';b.textContent='Try again';b.style.background='';$('#reactResult').textContent=`Your reaction time: ${ms} ms`;}}; 
+}
+</script>
+</body>
+</html>
